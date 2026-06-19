@@ -8,7 +8,7 @@ contractor's guarantee — raises an action automatically via **PostGIS** geo-ma
 
 > Built on top of a YOLOv5 RDD2022 model (5 damage classes: longitudinal / transverse /
 > alligator cracks, potholes, surface corruption).
-
+ 
 ---
 
 ## Features
