@@ -1,9 +1,26 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { fetchDamageReport } from '../lib/api'
-import type { BBox, DamageReportItem } from '../lib/types'
+import type { BBox, DamageClass, DamageReportItem } from '../lib/types'
+
+const DAMAGE_KEYS: Record<DamageClass, string> = {
+  'longitudinal crack': 'longitudinal',
+  'transverse crack':   'transverse',
+  'alligator crack':    'alligator',
+  'Pothole':            'pothole',
+  'other corruption':   'other',
+}
+
+type Stats = Record<DamageClass, number>
+const EMPTY_STATS: Stats = {
+  'longitudinal crack': 0,
+  'transverse crack':   0,
+  'alligator crack':    0,
+  'Pothole':            0,
+  'other corruption':   0,
+}
 
 
 const FALLBACK_CENTER: [number, number] = [-33.882, 151.197]
@@ -79,6 +96,13 @@ export function FieldCapturePage() {
 
   const damagePins = pins.filter((it) => it.damages.length > 0)
 
+  const stats = useMemo(() => {
+    const s: Stats = { ...EMPTY_STATS }
+    for (const it of pins) for (const d of it.damages) s[d.damage_class] = (s[d.damage_class] ?? 0) + 1
+    return s
+  }, [pins])
+  const totalDamages = useMemo(() => Object.values(stats).reduce((a, b) => a + b, 0), [stats])
+
   return (
     <div className="dashboard-shell">
       <aside className="sidebar">
@@ -138,6 +162,21 @@ export function FieldCapturePage() {
                 </button>
               )}
             </div>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="card-title">
+            Damages on screen
+            <span className="badge">{damagePins.length} img · {totalDamages}</span>
+          </div>
+          <div className="chip-row">
+            {(Object.entries(stats) as [DamageClass, number][]).map(([k, v]) => (
+              <span key={k} className={`chip ${v === 0 ? 'empty' : ''}`}>
+                <span className="chip-swatch" style={{ background: `var(--c-${DAMAGE_KEYS[k]})` }} />
+                {k} <strong>{v}</strong>
+              </span>
+            ))}
           </div>
           {error && <div className="error-text" style={{ marginTop: 8 }}>{error}</div>}
         </div>
