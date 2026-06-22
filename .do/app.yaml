@@ -6,6 +6,7 @@ services:
     source_dir: /
     dockerfile_path: apps/backend-local/Dockerfile
     github:
+      repo: llravelo/patchguard-erp
       branch: main
       deploy_on_push: true
     instance_size_slug: basic-xs   # 1 GB RAM, 1 vCPU — minimum for YOLOv5 CPU inference
@@ -55,6 +56,7 @@ services:
     source_dir: apps/agent
     dockerfile_path: Dockerfile.agent
     github:
+      repo: llravelo/patchguard-erp
       branch: main
       deploy_on_push: true
     instance_size_slug: basic-xxs  # 512 MB RAM — sufficient for the control plane
@@ -82,6 +84,7 @@ services:
     source_dir: apps/agent
     dockerfile_path: Dockerfile.worker
     github:
+      repo: llravelo/patchguard-erp
       branch: main
       deploy_on_push: true
     instance_size_slug: basic-xxs
