@@ -7,18 +7,16 @@ DATA_DIR; the index lives in PostgreSQL/PostGIS.
 """
 from __future__ import annotations
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
 import logging
 import os
 from contextlib import asynccontextmanager
 
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
 from model import YoloV5Damage, load_from_env
+
+load_dotenv()
 
 log = logging.getLogger("patchguard.backend")
 logging.basicConfig(level=logging.INFO)

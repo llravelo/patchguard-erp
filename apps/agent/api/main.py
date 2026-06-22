@@ -6,27 +6,21 @@ The (vision) LLM lives in the backend service, applied per detected-damage image
 """
 from __future__ import annotations
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
-import asyncio  # noqa: E402  (kept for future retry/backoff helpers)
 import logging
 import os
 import uuid
 from contextlib import asynccontextmanager
 
+from agent.routing.sampler import sample_polyline
+from api.jobs import JobRegistry
+from api.schemas import CreateJobRequest, CreateJobResponse, JobStatusResponse
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
-from agent.routing.directions import directions_polyline
-from agent.routing.sampler import sample_polyline
-from api.jobs import JobRegistry
-from api.schemas import (
-    CreateJobRequest,
-    CreateJobResponse,
-    JobStatusResponse,
-)
+load_dotenv()
+
+from agent.routing.directions import directions_polyline  # noqa: E402
 
 log = logging.getLogger("patchguard.api")
 logging.basicConfig(level=logging.INFO)

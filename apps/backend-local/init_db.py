@@ -17,15 +17,14 @@ from datetime import date, timedelta
 from decimal import Decimal
 
 from dotenv import load_dotenv
+from geo import linestring_wkt
+from sqlalchemy import select, text
 
 load_dotenv()
 
-from sqlalchemy import select, text
-
-from db import Base, SessionLocal, engine
-from geo import linestring_wkt
-from models_db import Contractor, Role, User, WorkRecord
-from security import hash_password
+from db import Base, SessionLocal, engine  # noqa: E402
+from models_db import Contractor, Role, User, WorkRecord  # noqa: E402
+from security import hash_password  # noqa: E402
 
 # A stretch of Abercrombie Street, Darlington — handy demo street near Ultimo.
 DEMO_PATH = [

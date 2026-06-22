@@ -27,7 +27,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from db import SessionLocal, get_session
 from geo import point_wkt
 from models_db import Action, Damage, Image, Role, Source, User, WorkRecord
-from security import current_user, require_role
+from security import require_role
 
 log = logging.getLogger("patchguard.mobile")
 
@@ -89,7 +89,7 @@ async def trigger_analysis(
 ) -> dict:
     """Start background inference on all unanalyzed mobile images. Returns immediately."""
     pending = (
-        await session.execute(select(Image).where(Image.analyzed == False))
+        await session.execute(select(Image).where(Image.analyzed.is_(False)))
     ).scalars().all()
     image_ids = [img.id for img in pending]
     if image_ids:
