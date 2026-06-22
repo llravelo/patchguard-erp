@@ -1,6 +1,24 @@
 name: patchguard-erp
 region: syd
 
+ingress:
+  rules:
+    - component:
+        name: backend
+      match:
+        path:
+          prefix: /api
+    - component:
+        name: agent
+      match:
+        path:
+          prefix: /jobs
+    - component:
+        name: agent
+      match:
+        path:
+          prefix: /worker
+
 services:
   - name: backend
     source_dir: /
@@ -70,7 +88,7 @@ services:
         type: SECRET
       - key: PATCHGUARD_API_BASE
         scope: RUN_TIME
-        type: SECRET            # set to the backend service public URL
+        type: SECRET            # set to the app public URL, e.g. https://patchguard-erp-xxxxx.ondigitalocean.app
       - key: CAPTURE_SOURCE
         scope: RUN_TIME
         value: satellite        # avoids Puppeteer/Chrome; switch to "streetview" + add GOOGLE_MAPS_API_KEY if needed
@@ -78,7 +96,8 @@ services:
         scope: RUN_TIME
         type: SECRET
 
-  # Capture worker is optional — handles autonomous Street View / satellite inspection.
+workers:
+  # Capture worker — handles autonomous Street View / satellite inspection.
   # Comment out this block if you don't need the autonomous inspection feature.
   - name: worker
     source_dir: apps/agent
@@ -92,7 +111,7 @@ services:
     envs:
       - key: AGENT_BASE
         scope: RUN_TIME
-        type: SECRET            # set to the agent service public URL
+        type: SECRET            # set to the app public URL, e.g. https://patchguard-erp-xxxxx.ondigitalocean.app
       - key: WORKER_TOKEN
         scope: RUN_TIME
         type: SECRET
