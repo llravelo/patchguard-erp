@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from geoalchemy2.functions import ST_DWithin, ST_Distance, ST_GeogFromText
 from pydantic import BaseModel
 from sqlalchemy import select
@@ -135,10 +135,10 @@ async def upload_batch(
     if len(items) != len(files):
         raise HTTPException(400, f"files ({len(files)}) and items ({len(items)}) must match")
 
+    from storage import upload_annotated
+
     raw_dir = DATA_DIR / "raw"
-    annotated_dir = DATA_DIR / "annotated"
     raw_dir.mkdir(parents=True, exist_ok=True)
-    annotated_dir.mkdir(parents=True, exist_ok=True)
 
     base = str(request.base_url).rstrip("/")
     out: list[dict] = []
@@ -156,7 +156,7 @@ async def upload_batch(
         except Exception as e:
             log.exception("inference failed for %s", meta.get("filename"))
             raise HTTPException(500, f"inference failed: {e}") from e
-        (annotated_dir / f"{image_id}.jpg").write_bytes(annotated)
+        annotated_path = upload_annotated(annotated, image_id)
 
         caption = vision_caption(annotated) if detections else None
         if caption:
@@ -173,7 +173,7 @@ async def upload_batch(
             heading=meta.get("heading"),
             captured_at=meta["captured_at"],
             raw_path=str(raw_dir / f"{image_id}.jpg"),
-            annotated_path=str(annotated_dir / f"{image_id}.jpg"),
+            annotated_path=annotated_path,
             vision_description=caption,
             source=Source.worker,
             analyzed=True,
@@ -314,7 +314,11 @@ async def damage_report(
 @router.get("/images/{image_id}/annotated")
 async def annotated(image_id: str, session: AsyncSession = Depends(get_session)):
     img = (await session.execute(select(Image).where(Image.id == image_id))).scalar_one_or_none()
-    if img is None or not img.annotated_path or not Path(img.annotated_path).exists():
+    if img is None or not img.annotated_path:
+        raise HTTPException(404, "image not found")
+    if img.annotated_path.startswith("http"):
+        return RedirectResponse(img.annotated_path)
+    if not Path(img.annotated_path).exists():
         raise HTTPException(404, "image not found")
     return FileResponse(img.annotated_path, media_type="image/jpeg")
 

@@ -102,9 +102,9 @@ async def _analyze_pending(image_ids: list[str]) -> None:
     from main import APP
     from model import vision_caption
 
+    from storage import upload_annotated
+
     action_radius = float(os.environ.get("ACTION_MATCH_RADIUS_M", "30"))
-    annotated_dir = DATA_DIR / "annotated"
-    annotated_dir.mkdir(parents=True, exist_ok=True)
 
     async with SessionLocal() as session:
         for image_id in image_ids:
@@ -118,9 +118,7 @@ async def _analyze_pending(image_ids: list[str]) -> None:
             try:
                 jpeg = Path(img.raw_path).read_bytes()
                 detections, annotated_bytes = APP.model.infer(jpeg)
-                annotated_path = annotated_dir / f"{img.id}.jpg"
-                annotated_path.write_bytes(annotated_bytes)
-                img.annotated_path = str(annotated_path)
+                img.annotated_path = upload_annotated(annotated_bytes, img.id)
                 img.vision_description = vision_caption(annotated_bytes) if detections else None
 
                 damage_rows: list[Damage] = []
