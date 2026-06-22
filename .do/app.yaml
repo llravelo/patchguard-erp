@@ -72,7 +72,7 @@ services:
 
   - name: agent
     source_dir: apps/agent
-    dockerfile_path: Dockerfile.agent
+    dockerfile_path: apps/agent/Dockerfile.agent
     github:
       repo: llravelo/patchguard-erp
       branch: main
@@ -101,7 +101,7 @@ workers:
   # Comment out this block if you don't need the autonomous inspection feature.
   - name: worker
     source_dir: apps/agent
-    dockerfile_path: Dockerfile.worker
+    dockerfile_path: apps/agent/Dockerfile.worker
     github:
       repo: llravelo/patchguard-erp
       branch: main
