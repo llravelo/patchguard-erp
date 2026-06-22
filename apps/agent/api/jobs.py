@@ -52,9 +52,16 @@ class JobRegistry:
         })
         return job
 
-    async def claim_next(self) -> Job | None:
-        """Worker calls this to pick up the next pending job. Blocks on empty."""
-        job_id = await self._pending.get()
+    async def claim_next(self, timeout: float = 25.0) -> Job | None:
+        """Worker calls this to pick up the next pending job.
+
+        Returns None after `timeout` seconds so the worker can retry rather than
+        holding the connection open past undici's headersTimeout (5 min default).
+        """
+        try:
+            job_id = await asyncio.wait_for(self._pending.get(), timeout=timeout)
+        except asyncio.TimeoutError:
+            return None
         async with self._lock:
             job = self._jobs.get(job_id)
             if job is None:
