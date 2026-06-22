@@ -28,6 +28,7 @@ from models_db import (
     Inspection,
     InspectionStatus,
     Role,
+    Source,
     User,
     WorkRecord,
 )
@@ -174,6 +175,8 @@ async def upload_batch(
             raw_path=str(raw_dir / f"{image_id}.jpg"),
             annotated_path=str(annotated_dir / f"{image_id}.jpg"),
             vision_description=caption,
+            source=Source.worker,
+            analyzed=True,
         )
         session.add(img)
 
@@ -260,17 +263,28 @@ async def damage_report(
     lat_min: float,
     lon_max: float,
     lat_max: float,
+    source: str | None = None,
+    inspection_id: str | None = None,
+    date_from: str | None = None,
+    date_to: str | None = None,
     _: User = Depends(current_user),
     session: AsyncSession = Depends(get_session),
 ) -> list[dict]:
-    images = (
-        await session.execute(
-            select(Image)
-            .options(selectinload(Image.damages))
-            .where(Image.lng >= lon_min, Image.lng <= lon_max)
-            .where(Image.lat >= lat_min, Image.lat <= lat_max)
-        )
-    ).scalars().all()
+    q = (
+        select(Image)
+        .options(selectinload(Image.damages))
+        .where(Image.lng >= lon_min, Image.lng <= lon_max)
+        .where(Image.lat >= lat_min, Image.lat <= lat_max)
+    )
+    if source is not None:
+        q = q.where(Image.source == source)
+    if inspection_id is not None:
+        q = q.where(Image.inspection_id == inspection_id)
+    if date_from is not None:
+        q = q.where(Image.captured_at >= date_from)
+    if date_to is not None:
+        q = q.where(Image.captured_at <= date_to + "T23:59:59")
+    images = (await session.execute(q)).scalars().all()
     base = str(request.base_url).rstrip("/")
     return [
         {

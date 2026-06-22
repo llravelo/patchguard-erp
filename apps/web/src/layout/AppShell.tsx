@@ -42,6 +42,7 @@ export function AppShell() {
           {hasRole('admin') && tab('/app/users', 'Users & Accounts')}
           {tab('/app/contractors', 'Contractors')}
           {tab('/app/inspection', 'Inspection')}
+          {tab('/app/field-captures', 'Field Captures')}
           {tab('/app/actions', 'Actions', openActions)}
         </nav>
         <div className="header-user">

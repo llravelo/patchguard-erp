@@ -47,12 +47,13 @@ app.add_middleware(
 )
 
 # Routers import APP from this module — import after APP is defined.
-from routers import actions, auth, contractors, inspections, users  # noqa: E402
+from routers import actions, auth, contractors, field_captures, inspections, users  # noqa: E402
 
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(contractors.router)
 app.include_router(inspections.router)
+app.include_router(field_captures.router)
 app.include_router(actions.router)
 
 

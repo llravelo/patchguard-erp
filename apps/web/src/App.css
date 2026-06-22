@@ -291,6 +291,7 @@ button { font: inherit; }
 .dmg-pin-inner.alligator    { background: var(--c-alligator); }
 .dmg-pin-inner.pothole      { background: var(--c-pothole); }
 .dmg-pin-inner.other        { background: var(--c-other); }
+.dmg-pin-inner.mobile       { background: #f97316; }
 
 /* === Damage detail modal === */
 .modal-backdrop {

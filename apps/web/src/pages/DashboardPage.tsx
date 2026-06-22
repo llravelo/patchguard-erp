@@ -237,7 +237,7 @@ export function DashboardPage() {
     setLoading(true)
     setError(null)
     try {
-      const data = await fetchDamageReport(bbox, controller.signal)
+      const data = await fetchDamageReport(bbox, controller.signal, { source: 'worker' })
       setItems(data)
     } catch (err) {
       if ((err as Error)?.name === 'AbortError') return

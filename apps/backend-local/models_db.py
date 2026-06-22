@@ -43,6 +43,11 @@ class Role(str, enum.Enum):
     viewer = "viewer"
 
 
+class Source(str, enum.Enum):
+    worker = "worker"
+    mobile = "mobile"
+
+
 class InspectionStatus(str, enum.Enum):
     running = "running"
     done = "done"
@@ -136,6 +141,8 @@ class Image(Base):
     raw_path: Mapped[str | None] = mapped_column(Text, nullable=True)
     annotated_path: Mapped[str | None] = mapped_column(Text, nullable=True)
     vision_description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    source: Mapped[str] = mapped_column(String(16), default=Source.worker, server_default="worker")
+    analyzed: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
 
     inspection: Mapped[Inspection | None] = relationship(back_populates="images")
     damages: Mapped[list[Damage]] = relationship(back_populates="image")

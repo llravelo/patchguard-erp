@@ -40,6 +40,9 @@ async def main() -> None:
     async with engine.begin() as conn:
         await conn.execute(text("CREATE EXTENSION IF NOT EXISTS postgis"))
         await conn.run_sync(Base.metadata.create_all)
+        # Idempotent column migrations for existing DBs.
+        await conn.execute(text("ALTER TABLE images ADD COLUMN IF NOT EXISTS source VARCHAR DEFAULT 'worker'"))
+        await conn.execute(text("ALTER TABLE images ADD COLUMN IF NOT EXISTS analyzed BOOLEAN DEFAULT TRUE"))
     print("tables created")
 
     async with SessionLocal() as session:

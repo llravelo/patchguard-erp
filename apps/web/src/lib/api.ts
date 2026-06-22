@@ -55,16 +55,21 @@ export async function uploadBatch(frames: Frame[], signal?: AbortSignal): Promis
   }
 }
 
-/** GET /api/v1/images/damage-report?lon_min&lat_min&lon_max&lat_max */
+/** GET /api/v1/images/damage-report?lon_min&lat_min&lon_max&lat_max[&source][&inspection_id] */
 export async function fetchDamageReport(
   bbox: BBox,
   signal?: AbortSignal,
+  opts?: { source?: string; inspectionId?: string; dateFrom?: string; dateTo?: string },
 ): Promise<DamageReportItem[]> {
   const url = new URL(`${getApiBase()}/api/v1/images/damage-report`)
   url.searchParams.set('lon_min', String(bbox.lonMin))
   url.searchParams.set('lat_min', String(bbox.latMin))
   url.searchParams.set('lon_max', String(bbox.lonMax))
   url.searchParams.set('lat_max', String(bbox.latMax))
+  if (opts?.source) url.searchParams.set('source', opts.source)
+  if (opts?.inspectionId) url.searchParams.set('inspection_id', opts.inspectionId)
+  if (opts?.dateFrom) url.searchParams.set('date_from', opts.dateFrom)
+  if (opts?.dateTo) url.searchParams.set('date_to', opts.dateTo)
   const headers = new Headers()
   const token = getToken()
   if (token) headers.set('Authorization', `Bearer ${token}`)

@@ -8,6 +8,7 @@ import { UsersPage } from './pages/UsersPage'
 import { ContractorsPage } from './pages/ContractorsPage'
 import { InspectionPage } from './pages/InspectionPage'
 import { ActionsPage } from './pages/ActionsPage'
+import { FieldCapturePage } from './pages/FieldCapturePage'
 import './App.css'
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
@@ -52,6 +53,7 @@ export default function App() {
               <Route path="users" element={<Protected roles={['admin']}><UsersPage /></Protected>} />
               <Route path="contractors" element={<ContractorsPage />} />
               <Route path="inspection" element={<InspectionPage />} />
+              <Route path="field-captures" element={<FieldCapturePage />} />
               <Route path="actions" element={<ActionsPage />} />
               <Route index element={<Navigate to="inspection" replace />} />
             </Route>
