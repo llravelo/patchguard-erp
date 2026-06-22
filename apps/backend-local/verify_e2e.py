@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import pathlib
 import sys
 
 import httpx
@@ -18,9 +19,9 @@ load_dotenv()
 
 BASE = "http://localhost:8000"
 WORKER_TOKEN = os.environ["WORKER_TOKEN"]
-SAMPLE_IMG = (
-    "/mnt/c/Users/banan/Desktop/DEepLearningAssignment3/archive (2)/"
-    "RDD_SPLIT/val/images/China_Drone_000013.jpg"
+SAMPLE_IMG = os.environ.get(
+    "SAMPLE_IMG",
+    str(pathlib.Path(__file__).parent.parent.parent / "yolov5" / "data" / "images" / "zidane.jpg"),
 )
 # A point on the seeded Abercrombie St work path (within 30 m).
 ON_PATH = (-33.89071, 151.19833)
